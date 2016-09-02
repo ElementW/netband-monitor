@@ -6,16 +6,16 @@ import gi
 gi.require_version('Gtk', '3.0')
 from gi.repository import Gtk
 
-import ui.gtk3
-import netstats
+import netbandmonitor.netstats, netbandmonitor.ui.gtk3
 
 if __name__ == '__main__':
-    monitor = netstats.NetworkStatisticsMonitorThread(['wlp3s0'])
+    monitor = netbandmonitor.netstats.NetworkStatisticsMonitorThread(
+      netbandmonitor.netstats.list_network_interfaces())
     monitor.start()
-    win = ui.gtk3.NetbandMonitorWindow(monitor)
+    win = netbandmonitor.ui.gtk3.NetbandMonitorWindow(monitor)
     win.connect('delete-event', Gtk.main_quit)
     win.connect('delete-event', lambda x, y: monitor.stop())
-    t = threading.Timer(6, lambda: win.context.add_class('transparent'))
+    #t = threading.Timer(6, lambda: win.context.add_class('transparent'))
     #t.start()
     
     win.show_all()

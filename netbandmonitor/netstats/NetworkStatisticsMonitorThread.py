@@ -1,6 +1,6 @@
 import threading, os, time
 from collections import deque, namedtuple
-from constants import *
+from .constants import *
 
 ByteCount = namedtuple('ByteCount', ['rx', 'tx'])
 TimedByteCount = namedtuple('TimedByteCount', ['time', 'count'])

@@ -4,19 +4,8 @@ from gi.repository import Gtk, Gio, Gdk, GLib
 import threading, time, math, cairo, inspect, os.path
 from collections import deque
 
-from LineChart import LineChart
-from StatLine import StatLine
-
-class Config(object):
-    def __init__(self, *args, **kwargs):
-        self.bandwidth_max_download_per_sec = None
-        self.bandwidth_max_upload_per_sec = None
-
-        self.status_icon_max_download_per_sec = None
-        self.status_icon_max_upload_per_sec = None
-        self.status_icon_bgcolor = (0, 0, 0)
-        self.status_icon_download_color = (1, 0, 0)
-        self.status_icon_upload_color = (0, 1, 0)
+from . import LineChart, StatLine
+from ...settings import Settings
 
 class NetbandMonitorWindow(Gtk.Window):
     __gtype_name__ = 'NetbandMonitorWindow'
@@ -121,11 +110,11 @@ class NetbandMonitorWindow(Gtk.Window):
                         self.format_value(self.total_up / (now - self.running_since)) + "/s"
 
                 # Chart
-                viz_maxdown = self.window.config.status_icon_max_download_per_sec or \
-                              self.window.config.bandwidth_max_download_per_sec or \
+                viz_maxdown = self.window.settings.status_icon_max_download_per_sec or \
+                              self.window.settings.bandwidth_max_download_per_sec or \
                               record_down_per_sec or 1
-                viz_maxup = self.window.config.status_icon_max_upload_per_sec or \
-                            self.window.config.bandwidth_max_upload_per_sec or \
+                viz_maxup = self.window.settings.status_icon_max_upload_per_sec or \
+                            self.window.settings.bandwidth_max_upload_per_sec or \
                             record_up_per_sec or 1
                 viz_max = max(viz_maxup, viz_maxdown)
                 self.window.chart.lines[0].data.append(down)
@@ -144,14 +133,14 @@ class NetbandMonitorWindow(Gtk.Window):
                     self.window.status_icon_context.identity_matrix()
                     self.window.status_icon_context.set_line_width(0)
                 ctx = self.window.status_icon_context
-                ctx.set_source_rgb(*self.window.config.status_icon_bgcolor)
+                ctx.set_source_rgb(*self.window.settings.status_icon_bgcolor)
                 ctx.rectangle(0, 0, 22, 22)
                 ctx.fill()
-                ctx.set_source_rgb(*self.window.config.status_icon_download_color)
+                ctx.set_source_rgb(*self.window.settings.status_icon_download_color)
                 h = (down_per_sec / float(viz_max)) * 20
                 ctx.rectangle(2, 1+(20-h), 9, h)
                 ctx.fill()
-                ctx.set_source_rgb(*self.window.config.status_icon_upload_color)
+                ctx.set_source_rgb(*self.window.settings.status_icon_upload_color)
                 h = (up_per_sec / float(viz_max)) * 20
                 ctx.rectangle(13, 1+(20-h), 9, h)
                 ctx.fill()
@@ -167,7 +156,7 @@ class NetbandMonitorWindow(Gtk.Window):
     def __init__(self, net_monitor, *args, **kwargs):
         super(NetbandMonitorWindow, self).__init__(*args, **kwargs)
         self.set_size_request(240, 40)
-        self.config = Config()
+        self.settings = Settings()
         self.net_monitor = net_monitor
         self.screen = self.get_screen()
         self.display = self.screen.get_display()

@@ -1,5 +1,6 @@
-from NetworkStatisticsMonitorThread import NetworkStatisticsMonitorThread
-from constants import *
+import os
+from .NetworkStatisticsMonitorThread import NetworkStatisticsMonitorThread
+from .constants import *
 
 def list_network_interfaces():
     interfaces = []
